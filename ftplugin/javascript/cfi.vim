@@ -61,7 +61,7 @@ let s:FUNCTION_TYPE       = '\('
       \.'\)'
 
 " (...)
-let s:FUNCTION_ARGUMENTS  = '\(' . '([^)]*)' . '\)'
+let s:FUNCTION_ARGUMENTS  = '\(' . '([^()]*)' . '\)'
 
 " ----------------------------------------------------------------------------
 " Composite regexes
@@ -76,7 +76,11 @@ let s:VARIABLE = '\%('
 
 let s:ANONYMOUS_FUNCTION = '\%('
       \.  s:FUNCTION_TYPE
+      \.  '\%('
+      \.  '\zeconstructor'
+      \.  '\|'
       \.  '[[:blank:]*]\+'
+      \.  '\)'
       \.  s:FUNCTION_ARGUMENTS
       \.'\)'
 
@@ -100,6 +104,7 @@ let s:BEGIN_PATTERN = '\C'
       \.  '\|' . s:ARROW_FUNCTION . '\s*{'
       \. '\)\{1}'
 
+let g:save_begin= s:BEGIN_PATTERN
 " ============================================================================
 " Create cfi finder dictionary of functions
 " ============================================================================
@@ -180,9 +185,9 @@ function! s:finder.get_func_name() "{{{
   " Use the setting dict to selectively show parts of the name
   " Don't let the user break this, cycle through our dictionary for keys
   let l:result = ''
-  for var in keys(s:show_defaults)
-    if g:cfi_javascript_show[var]
-      let l:result .= l:{var}
+  for l:var in keys(s:show_defaults)
+    if g:cfi_javascript_show[l:var]
+      let l:result .= l:{l:var}
     endif
   endfor
   return l:result
